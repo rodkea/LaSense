@@ -1,6 +1,6 @@
-from PySide2.QtWidgets import QHBoxLayout, QMainWindow, QWidget
-from PySide2.QtCore import Qt
-from Widgets import Button
+from PySide6.QtWidgets import QHBoxLayout, QMainWindow, QWidget
+from PySide6.QtCore import Qt
+from Components import ButtonsMenu
 
 class MainWindow(QMainWindow):
 
@@ -10,13 +10,8 @@ class MainWindow(QMainWindow):
         # CENTRAL WIDGET
         self._central_widget = QWidget(self)
         self._layout = QHBoxLayout()
-        self._button = Button(
-            icon_path="Assets/svg/config.svg",
-            icon_path_hover="Assets/svg/config-hover.svg",
-            icon_path_disabled="Assets/svg/config-disabled.svg"
-            
-            )
-        self._layout.addWidget(self._button)
+        self._button_menu = ButtonsMenu(parent=self._central_widget)
+        self._layout.addWidget(self._button_menu)
         self._central_widget.setLayout(self._layout)
 
         # WINDOW SETUP

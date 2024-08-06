@@ -1,9 +1,12 @@
 import sys
-from Windows import MainWindow
-from PySide2.QtWidgets import QApplication
+from Windows import MainWindow, SplashScreen
+from PySide6.QtWidgets import QApplication
 
 if __name__ == "__main__":
   app = QApplication(sys.argv)
+  splash = SplashScreen()
+  splash.show()
   w = MainWindow()
   w.showMaximized()
-  sys.exit(app.exec_())
+  splash.finish(w)
+  sys.exit(app.exec())
