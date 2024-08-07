@@ -1,16 +1,17 @@
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import  Qt
+from PySide6.QtCore import  Qt, Signal
 from PySide6.QtGui import QCursor
 
 
 class Button(QSvgWidget):
-    # signal: Signal,
+    
     def __init__(self, icon_path: str, 
                  icon_path_hover: str | None = None,
                  icon_path_disabled: str | None = None,
                  enabled: bool = True,
                  width: int = 25, height: int = 25,
+                 signal: Signal | None = None,
                  parent: QWidget | None = None):
         """Creates a Button with an SVG icon.
         Args:
@@ -25,7 +26,7 @@ class Button(QSvgWidget):
         super().__init__(parent)
         self.setFixedSize(width, height)
         self._is_enabled = enabled
-        #self._signal = signal
+        self._signal = signal
         # ICON PATHS
         self._icon_path = icon_path
         if icon_path_hover:
@@ -65,9 +66,8 @@ class Button(QSvgWidget):
     def mousePressEvent(self, event):
         # Manejar el evento de click
         if event.button() == Qt.LeftButton:
-            if self.is_enabled:
-              self.set_disabled()
-              #self._signal.emit()
+            if self.is_enabled and self._signal != None:
+              self._signal.emit()
         super().mousePressEvent(event)
 
     def set_enabled(self):

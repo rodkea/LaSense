@@ -7,5 +7,5 @@ class Signals(QObject):
   on_record_signal = Signal()
   on_config_signal = Signal()
   on_stop_signal = Signal()
-  
+  on_exit_signal = Signal()
   
