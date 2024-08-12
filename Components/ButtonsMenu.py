@@ -21,7 +21,8 @@ class ButtonsMenu(QWidget):
     self._analyze_btn = Button(
       icon_path="Assets/svg/ml.svg",
       icon_path_hover="Assets/svg/ml-hover.svg",
-      icon_path_disabled="Assets/svg/ml-disabled.svg"    
+      icon_path_disabled="Assets/svg/ml-disabled.svg",
+      signal=self._signals.on_analize_signal  
     )
     self._layout.addWidget(self._analyze_btn)
     # CONFIG BUTTON

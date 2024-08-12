@@ -18,15 +18,14 @@ class ConfigPopup(QDialog):
     self._layout = QVBoxLayout()
     self.setLayout(self._layout)
     # LINE EDIT
-    self._basename_le = LineEdit(text="Nombre base", parent=self)
+    self._basename_le = LineEdit(text="Nombre base")
     self._layout.addWidget(self._basename_le)
     # SLIDERS
     # SLIDERS -> BRIGHTNESS
     self._brightness_slider = Slider(
       icon_path="Assets/svg/brightness.svg",
       tooltip="Brillo",
-      label_format="f'{value} %'",
-      parent=self
+      label_format="f'{value} %'"
       )
     self._layout.addWidget(self._brightness_slider)
     # SLIDERS -> CONTRAST
@@ -34,8 +33,7 @@ class ConfigPopup(QDialog):
       icon_path="Assets/svg/contrast.svg",
       tooltip="Contraste",
       max_value=320,
-      label_format="f'{value / 10}'",
-      parent=self
+      label_format="f'{value / 10}'"
       )
     self._layout.addWidget(self._contrast_slider)
     # SLIDERS -> SATURATION
@@ -43,8 +41,7 @@ class ConfigPopup(QDialog):
       icon_path="Assets/svg/saturation.svg",
       tooltip="Saturación",
       max_value=320,
-      label_format="f'{value / 10}'",
-      parent=self
+      label_format="f'{value / 10}'"
       )
     self._layout.addWidget(self._saturation_slider)
     # SLIDERS -> ISO
@@ -52,8 +49,7 @@ class ConfigPopup(QDialog):
       icon_path="Assets/svg/iso.svg",
       tooltip="ISO",
       max_value=106,
-      label_format="f'{value / 10}'",
-      parent=self
+      label_format="f'{value / 10}'"
       )
     self._layout.addWidget(self._iso_slider)
     # SLIDERS -> SHARPNESS
@@ -61,12 +57,11 @@ class ConfigPopup(QDialog):
       icon_path="Assets/svg/sharpness.svg",
       tooltip="Sharpness",
       max_value=160,
-      label_format="f'{value / 10}'",
-      parent=self
+      label_format="f'{value / 10}'"
       )
     self._layout.addWidget(self._sharpness_slider)
     # NOISE SELECT
-    self._noise_reduction_select = NoiseReductionSelect(self)
+    self._noise_reduction_select = NoiseReductionSelect()
     self._layout.addWidget(self._noise_reduction_select)
     # BUTTONS
     self._ok_btn = QPushButton("Ok")
