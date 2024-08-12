@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QWidget
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QWidget
 
 class LineEdit(QWidget):
   

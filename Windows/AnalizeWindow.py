@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QFileSystemModel, QHBoxLayout, QListView, QPushButton, QSizePolicy, QStyledItemDelegate, QVBoxLayout, QWidget
-from PySide6.QtCore import QDir, QSize
+from PyQt5.QtWidgets import QFileSystemModel, QHBoxLayout, QListView, QPushButton, QSizePolicy, QStyledItemDelegate, QVBoxLayout, QWidget
+from PyQt5.QtCore import QDir, QSize
 
 class MyDelegate(QStyledItemDelegate):
   def sizeHint(self, option, index):

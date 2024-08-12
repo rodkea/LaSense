@@ -1,14 +1,16 @@
-from PySide6.QtWidgets import QLabel, QSlider, QWidget, QHBoxLayout
-from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt
+from PyQt5.QtWidgets import QLabel, QSlider, QWidget, QHBoxLayout
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtCore import Qt, pyqtSignal
+from Signals import Signals
 
 class Slider(QWidget):
   
-  def __init__(self, icon_path : str, tooltip : str = "",
+  def __init__(self, icon_path : str, signal : pyqtSignal, tooltip : str = "",
                min_value : int = 0, max_value : int = 100,
                step : int = 1, label_format: str = "f'{value}'",
                parent : QWidget | None = None):
     super().__init__(parent)
+    self._signal = signal
     self._layout = QHBoxLayout(self)
     self._svg = QSvgWidget(icon_path)
     self._svg.setFixedSize(35, 35)
@@ -40,6 +42,7 @@ class Slider(QWidget):
       except Exception as e:
           label_text = str(e)
       self._label.setText(label_text)
+      self._signal.emit(value)
     
     
     

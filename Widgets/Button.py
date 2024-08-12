@@ -1,7 +1,7 @@
-from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import  Qt, Signal
-from PySide6.QtGui import QCursor
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import  Qt, pyqtSignal
+from PyQt5.QtGui import QCursor
 
 
 class Button(QSvgWidget):
@@ -11,7 +11,7 @@ class Button(QSvgWidget):
                  icon_path_disabled: str | None = None,
                  enabled: bool = True,
                  width: int = 25, height: int = 25,
-                 signal: Signal | None = None,
+                 signal: pyqtSignal | None = None,
                  parent: QWidget | None = None):
         """Creates a Button with an SVG icon.
         Args:

@@ -1,11 +1,11 @@
-from PySide6.QtWidgets import QButtonGroup, QLineEdit, QDialog, QGroupBox, QPushButton, QRadioButton, QHBoxLayout, QVBoxLayout, QWidget
-from PySide6.QtCore import Qt
+from PyQt5.QtWidgets import QButtonGroup, QLineEdit, QDialog, QGroupBox, QPushButton, QRadioButton, QHBoxLayout, QVBoxLayout, QWidget
+from PyQt5.QtCore import Qt
 from Widgets import Slider, LineEdit
-
+from Signals import Signals
 
 class ConfigPopup(QDialog):
   
-  def __init__(self, parent : QWidget | None = None):
+  def __init__(self, signals : Signals, parent : QWidget | None = None, ):
     super().__init__(parent)
     # WINDOW SETUP
     self.resize(600,300)
@@ -23,6 +23,7 @@ class ConfigPopup(QDialog):
     # SLIDERS
     # SLIDERS -> BRIGHTNESS
     self._brightness_slider = Slider(
+      signal=signals.on_change_brightness,
       icon_path="Assets/svg/brightness.svg",
       tooltip="Brillo",
       label_format="f'{value} %'"
@@ -30,6 +31,7 @@ class ConfigPopup(QDialog):
     self._layout.addWidget(self._brightness_slider)
     # SLIDERS -> CONTRAST
     self._contrast_slider = Slider(
+      signal=signals.on_change_contrast ,
       icon_path="Assets/svg/contrast.svg",
       tooltip="Contraste",
       max_value=320,
@@ -38,6 +40,7 @@ class ConfigPopup(QDialog):
     self._layout.addWidget(self._contrast_slider)
     # SLIDERS -> SATURATION
     self._saturation_slider = Slider(
+      signal=signals.on_change_saturation,
       icon_path="Assets/svg/saturation.svg",
       tooltip="Saturación",
       max_value=320,
@@ -46,6 +49,7 @@ class ConfigPopup(QDialog):
     self._layout.addWidget(self._saturation_slider)
     # SLIDERS -> ISO
     self._iso_slider = Slider(
+      signal=signals.on_change_iso,
       icon_path="Assets/svg/iso.svg",
       tooltip="ISO",
       max_value=106,
@@ -54,6 +58,7 @@ class ConfigPopup(QDialog):
     self._layout.addWidget(self._iso_slider)
     # SLIDERS -> SHARPNESS
     self._sharpness_slider = Slider(
+      signal=signals.on_change_sharpness,
       icon_path="Assets/svg/sharpness.svg",
       tooltip="Sharpness",
       max_value=160,
