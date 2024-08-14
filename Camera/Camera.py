@@ -19,7 +19,9 @@ class Camera(Picamera2):
       super().__init__()        
       self._encoder = H264Encoder()  
       self._signals = signals
-      self._signals.on_change_brightness.connect(self.change_brightness)            
+      self._signals.on_change_brightness.connect(self._change_brightness)  
+      self._signals.on_change_contrast.connect(self._change_contrast)    
+      self._signals.on_change_iso.connect(self._change_iso)      
       self._user_config =  self._read_config_file(self.USER_CONFIG_PATH)
       self._default_config = self._read_config_file(self.DEFAULT_CONFIG_PATH)
       video_config = self.create_video_configuration(
@@ -83,7 +85,7 @@ class Camera(Picamera2):
               file.truncate()
               
     
-  def change_brightness(self, value):
+  def _change_brightness(self, value):
       """Changes the brightness setting of the camera.
 
       This method adjusts the brightness setting of the camera to the specified value where
@@ -107,24 +109,24 @@ class Camera(Picamera2):
       else:
           self.set_controls({"Brightness" : value})        
 
-  def change_contrast(self, value: float):
+  def _change_contrast(self, value: int):
       """Changes the brightness setting of the camera.
 
       This method adjusts the contrast setting of the camera to the specified value where
       0.0 means "no contrast", 1.0 is the default "normal" contrast, and larger values 
       increase the contrast proportinally.
-      If the provided value is greater than 32.0, the contrast setting is set to 32.0.
-      If the provided value is less than 0.0, the contrast setting is set to 0.0.
-      Otherwise, the contrast setting is set to the provided value.
+      If the provided value is greater than 320, the contrast setting is set to 32.0.
+      If the provided value is less than 0, the contrast setting is set to 0.0.
+      Otherwise, the contrast setting is set to the provided value divided by 10.0.
       
 
       Args:
-          value (float): The desired contrast value. Must be between 0.0 and 32.0.
+          value (int): The desired contrast value. Must be between 0 and 320.
 
       Returns:
           None
       """
-
+      value = value / 10.0
       if value > 32.0:
           self.set_controls({"Contrast" : 32.0})
       elif value < 0.0:
@@ -132,21 +134,22 @@ class Camera(Picamera2):
       else:
           self.set_controls({"Contrast" : value})
 
-  def change_analogue_gain(self, value : float):
+  def _change_iso(self, value : int):
       """Changes the analogue gain setting of the camera.
 
       This method adjusts the analogue gain setting of the camera to the specified value.         
-      If the provided value is greater than 10.6, the gain setting is set to 10.6.
-      If the provided value is less than 0.0, the gain setting is set to 0.0.
+      If the provided value is greater than 106, the gain setting is set to 10.6.
+      If the provided value is less than 0, the gain setting is set to 0.0.
       Otherwise, the gain setting is set to the provided value.
       
 
       Args:
-          value (float): The desired gain value. Must be between 0.0 and 10.6.
+          value (int): The desired gain value. Must be between 0 and 106.
 
       Returns:
           None
       """
+      value = value / 10.0
       if value > 10.6:
           self.set_controls({"AnalogueGain" : 10.6})
       elif value < 0.0:
@@ -199,22 +202,23 @@ class Camera(Picamera2):
       else:
           self.set_controls({"Saturation" : value})
 
-  def change_sharpness(self, value : float):
+  def change_sharpness(self, value : int):
       """Changes the sharpness setting of the camera.
 
       This method adjusts the amount of image sharpness to the specified value 
       where 0.0 implies no additional sharpering is performed, 1.0 represens default "normal" 
       sharpness,and larger values aplly poportionately stronger sharpening.
-      If the provided value is greater than 16.0, the sharpness setting is set to 16.0.
-      If the provided value is less than 0.0, the sharpness setting is set to 0.0.
+      If the provided value is greater than 160, the sharpness setting is set to 16.0.
+      If the provided value is less than 0, the sharpness setting is set to 0.0.
       Otherwise, the sharpness setting is set to the provided value.
 
       Args:
-          value (float): The desired sharpness value. Must be between 0.0 and 16.0.
+          value (int): The desired sharpness value. Must be between 00 and 160.
 
       Returns:
           None
       """
+      value = value / 10.0
       if value > 16.0:
           self.set_controls({"Sharpness" : 16.0})
       elif value < 0.0:
