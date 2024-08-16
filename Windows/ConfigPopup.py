@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QButtonGroup, QLineEdit, QDialog, QGroupBox, QPushButton, QRadioButton, QHBoxLayout, QVBoxLayout, QWidget
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from Widgets import Slider, LineEdit
 from Signals import Signals
+from config import ConfigType
 
 
 class ConfigPopup(QDialog):
@@ -65,6 +66,8 @@ class ConfigPopup(QDialog):
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint)
         self._layout = QVBoxLayout()
         self.setLayout(self._layout)
+        # SIGNALS
+        signals.on_set_user_settings.connect()
         # LINE EDIT
         self._basename_le = LineEdit(text="Nombre base")
         self._layout.addWidget(self._basename_le)
@@ -114,7 +117,7 @@ class ConfigPopup(QDialog):
         )
         self._layout.addWidget(self._sharpness_slider)
         # NOISE SELECT
-        self._noise_reduction_select = NoiseReductionSelect()
+        self._noise_reduction_select = NoiseReductionSelect(signal=signals.on_change_noise_reduction)
         self._layout.addWidget(self._noise_reduction_select)
         # BUTTONS
         self._ok_btn = QPushButton("Ok")
@@ -130,7 +133,22 @@ class ConfigPopup(QDialog):
     def _on_cancel(self):
         self.close()
 
-
+    def _on_load_settings(self, config : ConfigType):
+        self._iso_slider.set_value(config["AnalogueGain"])
+        self._basename_le.set_text(config["BaseName"])
+        self._brightness_slider.set_value(config["Brightness"])
+        self._contrast_slider.set_value(config['Contrast'])
+        self._noise_reduction_select.set
+        self._saturation_slider.set_value(config['Saturation'])
+        self._sharpness_slider.set_value(config['Sharpness'])
+        if config['NoiseReductionMode'] == 2:
+            self._noise_reduction_select.set_mode_hq()
+        elif config['NoiseReductionMode'] == 1:
+            self._noise_reduction_select.set_mode_fast()
+        else:
+            self._noise_reduction_select.set_mode_none()
+        
+        
 class NoiseReductionSelect(QGroupBox):
     """
     NoiseReductionSelect is a custom QGroupBox that provides options for selecting
@@ -160,7 +178,7 @@ class NoiseReductionSelect(QGroupBox):
         at a time.
     """
 
-    def __init__(self, parent: QWidget | None = None):
+    def __init__(self, signal: pyqtSignal | None = None, parent: QWidget | None = None):
         """
         Initializes the NoiseReductionSelect class.
 
@@ -179,7 +197,11 @@ class NoiseReductionSelect(QGroupBox):
         super().__init__(title="Reducción de ruido", parent=parent)
         self._layout = QHBoxLayout()
         self.setLayout(self._layout)
+        # SIGNAL
+        self._signal = signal
+        # BUTTON GROUP
         self._btn_group = QButtonGroup(self)
+        self._btn_group.buttonClicked.connect(self._on_select)
         self._rbtn_none = QRadioButton("Desactivada", self)
         self._layout.addWidget(self._rbtn_none)
         self._rbtn_fast = QRadioButton("Rápida", self)
@@ -190,3 +212,24 @@ class NoiseReductionSelect(QGroupBox):
         self._btn_group.addButton(self._rbtn_fast, 1)
         self._btn_group.addButton(self._rbtn_hq, 2)
         self.setLayout(self._layout)
+        
+    def set_mode_none(self):
+        """
+        Sets the None radio buttons a checked
+        """
+        self._rbtn_none.setChecked(True)
+    
+    def set_mode_fast(self):
+        """
+        Sets the Fast radio button as checked
+        """
+        self._rbtn_fast.setChecked(True)
+        
+    def set_mode_hq(self):
+        """
+        Sets the High Quality radio button as checked
+        """
+        self._rbtn_hq.setChecked(True)
+
+    def _on_select(self, btn : QWidget):
+      self._signal.emit(self._btn_group.id(btn))

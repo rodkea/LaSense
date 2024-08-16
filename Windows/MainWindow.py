@@ -5,6 +5,8 @@ from Signals import Signals
 from Camera import Camera, CameraPreview, Resolution
 from .ConfigPopup import ConfigPopup
 from .AnalizeWindow import AnalizeWindow
+from config import ConfigType
+import json
 
 class MainWindow(QMainWindow):
 
@@ -52,5 +54,37 @@ class MainWindow(QMainWindow):
         
     def _on_analyze(self):
         self._analyze_window.show()
+        
+    def _load_config(self, user_config_path : str) :
+        user_config = self._read_config(user_config)
+        self._signals.on_set_user_settings.emit(user_config)
+    
+    def _read_config(self, file_path : str) -> ConfigType:
+        """Read configuration settings from a file and returns them as a dictionary.
+
+         Args:
+        file_path (str): The path to the configuration file.
+
+        Returns:
+            ConfigType: A dictionary containing the configuration settings read from the file.
+        """
+        try:
+            with open(file_path, 'r') as file:
+                config_data = json.load(file)
+
+            # Ensure that the returned dictionary conforms to ConfigType
+            return ConfigType(
+                Brightness=config_data['Brightness'],
+                Contrast=config_data['Contrast'],
+                NoiseReductionMode=config_data['NoiseReductionMode'],
+                AnalogueGain=config_data['AnalogueGain'],
+                Sharpness=config_data['Sharpness'],
+                Saturation=config_data['Saturation'],
+                BaseName=config_data['BaseName']
+            )
+        except (FileNotFoundError, KeyError, json.JSONDecodeError) as e:
+            print(f"Error reading config file: {e}")
+            raise
+        
 
         

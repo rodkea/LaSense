@@ -87,5 +87,9 @@ class Slider(QWidget):
         except Exception as e:
             label_text = str(e)
         self._label.setText(label_text)
+
+    def set_value(self, value: int):
+        self._slider.setValue(value)
+        self._update_label(value)
         
     

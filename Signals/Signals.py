@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSignal
+from config import ConfigType
 
 class Signals(QObject):  
   
@@ -14,4 +15,6 @@ class Signals(QObject):
   on_change_iso = pyqtSignal(int)
   on_change_sharpness = pyqtSignal(int)
   on_change_saturation = pyqtSignal(int)
+  on_change_noise_reduction = pyqtSignal(int)
+  on_set_user_settings = pyqtSignal(ConfigType)
   

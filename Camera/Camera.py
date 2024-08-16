@@ -4,7 +4,9 @@ from .ConfigEnums import Resolution
 from picamera2.encoders import H264Encoder, Quality
 from datetime import datetime
 from Signals import Signals
+from config import ConfigType
 import os
+
 
 class Camera(Picamera2):
   """A class representing the PiCam V2
@@ -19,10 +21,14 @@ class Camera(Picamera2):
       super().__init__()        
       self._encoder = H264Encoder()  
       self._signals = signals
+      # SLOTS
       self._signals.on_change_brightness.connect(self._change_brightness)  
       self._signals.on_change_contrast.connect(self._change_contrast)    
-      self._signals.on_change_iso.connect(self._change_iso)      
+      self._signals.on_change_iso.connect(self._change_iso)   
+      self._signals.on_change_saturation(self._change_saturation)   
+      self._signals.on_change_sharpness(self._change_sharpness)
       self._user_config =  self._read_config_file(self.USER_CONFIG_PATH)
+      
       self._default_config = self._read_config_file(self.DEFAULT_CONFIG_PATH)
       video_config = self.create_video_configuration(
           main = {"size" : (1920, 1080)},
@@ -40,17 +46,17 @@ class Camera(Picamera2):
   def default_config(self):
       return self._default_config
 
-  def _read_config_file(self, file_path : str):
+  def _read_config_file(self, file_path : str) -> ConfigType:
       """Read configuration settings from a file and returns them as a dictionary.
 
       Args:
           file_path(str): The path to the configuration file.
       
       Returns:
-          dict: A dictionary containing the configuration setings read from the file.
+          ConfigType: A dictionary containing the configuration setings read from the file.
       """
 
-      config_dict = {}
+      config_dict : ConfigType = {}
       types = {
           "AnalogueGain" : float,
           "Brightness" : float,
@@ -85,7 +91,7 @@ class Camera(Picamera2):
               file.truncate()
               
     
-  def _change_brightness(self, value):
+  def _change_brightness(self, value : int):
       """Changes the brightness setting of the camera.
 
       This method adjusts the brightness setting of the camera to the specified value where
@@ -157,7 +163,7 @@ class Camera(Picamera2):
       else:
           self.set_controls({"AnalogueGain" : value})            
 
-  def change_noise_reduction(self, mode : int):
+  def _change_noise_reduction(self, mode : int):
       """Changes the noise reduction mode of the camera.
 
       This method adjusts the noise reduction mode of the camera to the specified value.
@@ -179,22 +185,23 @@ class Camera(Picamera2):
       else:
           self.set_controls({"NoiseReductionMode" : mode})            
 
-  def change_saturation(self, value : float):
+  def _change_saturation(self, value : int):
       """Changes the saturation setting of the camera.
 
       This method adjusts the amount of colour saturation to the specified value 
       where 0.0 produces greyscale images, 1.0 represens default "normal" saturation, and
       higher values produce more saturated colours.
-      If the provided value is greater than 32.0, the saturation setting is set to 32.0.
-      If the provided value is less than 0.0, the saturation setting is set to 0.0.
+      If the provided value is greater than 320, the saturation setting is set to 32.0.
+      If the provided value is less than 0, the saturation setting is set to 0.0.
       Otherwise, the saturation setting is set to the provided value.
 
       Args:
-          value (float): The desired saturation value. Must be between 0.0 and 32.0.
+          value (int): The desired saturation value. Must be between 0 and 320.
 
       Returns:
           None
       """
+      value = value / 10.0
       if value > 32.0:
           self.set_controls({"Saturation" : 32.0})
       elif value < 0.0:
@@ -202,7 +209,7 @@ class Camera(Picamera2):
       else:
           self.set_controls({"Saturation" : value})
 
-  def change_sharpness(self, value : int):
+  def _change_sharpness(self, value : int):
       """Changes the sharpness setting of the camera.
 
       This method adjusts the amount of image sharpness to the specified value 
@@ -242,7 +249,7 @@ class Camera(Picamera2):
       self.set_controls({ key:value for key, value in self.user_config.items() if key != "BaseName" })
       self.write_config_file("config/user.config", config)
   
-  def change_resolution(self, mode : int):
+  def _change_resolution(self, mode : int):
       """Changes the size (width and height) of output image.
       If the provided mode is less than 0 or greater than 2, the resolution is set to 1920x1080 .        
       Otherwise, the resolution mode is set according to the provided value:
