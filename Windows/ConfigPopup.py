@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QButtonGroup, QLineEdit, QDialog, QGroupBox, QPushBu
 from PyQt5.QtCore import Qt, pyqtSignal
 from Widgets import Slider, LineEdit
 from Signals import Signals
-from config import ConfigType
+from config import ConfigType, read_config, write_config, USER_CONFIG_PATH
 
 
 class ConfigPopup(QDialog):
@@ -67,7 +67,8 @@ class ConfigPopup(QDialog):
         self._layout = QVBoxLayout()
         self.setLayout(self._layout)
         # SIGNALS
-        signals.on_set_user_settings.connect()
+        signals.on_set_user_settings.connect(self._on_load_settings)
+        self._signals = signals
         # LINE EDIT
         self._basename_le = LineEdit(text="Nombre base")
         self._layout.addWidget(self._basename_le)
@@ -127,20 +128,33 @@ class ConfigPopup(QDialog):
         self._cancel_btn.clicked.connect(self._on_cancel)
         self._layout.addWidget(self._cancel_btn)
 
-    def _on_ok(self):
+    def _on_ok(self):  
+        config = ConfigType(
+            Brightness= (self._brightness_slider.value() - 50 ) / 100.0,
+            Contrast=self._contrast_slider.value() / 10.0,
+            NoiseReductionMode=self._noise_reduction_select.value(),
+            AnalogueGain=self._iso_slider.value() / 10.0,
+            Sharpness=self._sharpness_slider.value() / 10.0,
+            Saturation=self._saturation_slider.value() / 10.0,
+            BaseName=self._basename_le.text()
+        )      
+        write_config(USER_CONFIG_PATH, config)
+        self._signals.on_config_signal_done.emit()
         self.close()
 
     def _on_cancel(self):
+        user_setings = read_config(USER_CONFIG_PATH)
+        self._signals.on_set_user_settings.emit(user_setings)
+        self._signals.on_config_signal_done.emit()
         self.close()
 
     def _on_load_settings(self, config : ConfigType):
-        self._iso_slider.set_value(config["AnalogueGain"])
+        self._iso_slider.set_value(int(config["AnalogueGain"] * 10) )
         self._basename_le.set_text(config["BaseName"])
-        self._brightness_slider.set_value(config["Brightness"])
-        self._contrast_slider.set_value(config['Contrast'])
-        self._noise_reduction_select.set
-        self._saturation_slider.set_value(config['Saturation'])
-        self._sharpness_slider.set_value(config['Sharpness'])
+        self._brightness_slider.set_value(int(config["Brightness"] * 50) + 50)
+        self._contrast_slider.set_value(int(config['Contrast'] * 10))
+        self._saturation_slider.set_value(int(config['Saturation'] * 10))
+        self._sharpness_slider.set_value(int(config['Sharpness'] * 10))
         if config['NoiseReductionMode'] == 2:
             self._noise_reduction_select.set_mode_hq()
         elif config['NoiseReductionMode'] == 1:
@@ -233,3 +247,9 @@ class NoiseReductionSelect(QGroupBox):
 
     def _on_select(self, btn : QWidget):
       self._signal.emit(self._btn_group.id(btn))
+    
+    def value(self) -> int:
+        for button in self._btn_group.findChildren(QRadioButton):
+            if button.isChecked():
+                return self._btn_group.id(button)
+        return 0

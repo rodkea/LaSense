@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFileSystemModel, QHBoxLayout, QListView, QPushButton, QSizePolicy, QStyledItemDelegate, QVBoxLayout, QWidget
 from PyQt5.QtCore import QDir, QSize
-
+from Signals import Signals
 
 class MyDelegate(QStyledItemDelegate):
     """
@@ -63,10 +63,12 @@ class AnalizeWindow(QWidget):
         Applies a custom algorithm to video to compute a score.
     """
 
-    def __init__(self, parent: QWidget | None = None):
+    def __init__(self, signals = Signals, parent: QWidget | None = None):
       super().__init__(parent)
       self.hide()
       self._layout = QHBoxLayout()
+      # SIGNALS
+      self._signals = signals
       # FILE MODEL
       self._file_model = QFileSystemModel(parent=self)
       self._file_model.setFilter(
@@ -82,7 +84,7 @@ class AnalizeWindow(QWidget):
       self._right_layout = QVBoxLayout()
       # SALIR BUTTON
       self._btn_cancel = QPushButton("SALIR")
-      self._btn_cancel.clicked.connect(self.close)
+      self._btn_cancel.clicked.connect(self._on_close)
       self._layout.addWidget(self._btn_cancel)
       # ANALYZE BUTTON
       self._btn_analyze = QPushButton("ANALIZAR")
@@ -105,3 +107,6 @@ class AnalizeWindow(QWidget):
       Currently, it only prints 'ANALYZE' to the console.
       """
       print("ANALYZE")
+    
+    def _on_close(self):
+        self._signals.on_analyze_signal_done.emit()

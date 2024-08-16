@@ -41,7 +41,7 @@ class LineEdit(QWidget):
         self._layout.addWidget(self._le)
 
     def set_text(self, text: str):
-        self._le.setText()
+        self._le.setText(text)
 
     def text(self) -> str:
         return self._le.text()

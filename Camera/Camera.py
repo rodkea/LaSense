@@ -25,15 +25,20 @@ class Camera(Picamera2):
       self._signals.on_change_brightness.connect(self._change_brightness)  
       self._signals.on_change_contrast.connect(self._change_contrast)    
       self._signals.on_change_iso.connect(self._change_iso)   
-      self._signals.on_change_saturation(self._change_saturation)   
-      self._signals.on_change_sharpness(self._change_sharpness)
-      self._user_config =  self._read_config_file(self.USER_CONFIG_PATH)
+      self._signals.on_change_saturation.connect(self._change_saturation)   
+      self._signals.on_change_sharpness.connect(self._change_sharpness)
+      self._signals.on_set_user_settings.connect(self.change_user_config)
+      #self._user_config =  self._read_config_file(self.USER_CONFIG_PATH)
       
-      self._default_config = self._read_config_file(self.DEFAULT_CONFIG_PATH)
+      #self._default_config = self._read_config_file(self.DEFAULT_CONFIG_PATH)
+      #video_config = self.create_video_configuration(
+      #    main = {"size" : (1920, 1080)},
+      #     raw = {"format": 'SGBRG10'},                     
+      #   controls = { key:value for key, value in self.user_config.items() if key != "BaseName" }
+      #)
       video_config = self.create_video_configuration(
           main = {"size" : (1920, 1080)},
           raw = {"format": 'SGBRG10'},                     
-          controls = { key:value for key, value in self.user_config.items() if key != "BaseName" }
       )
       self.align_configuration(video_config)
       self.configure(video_config)          
@@ -247,7 +252,7 @@ class Camera(Picamera2):
       """
       self._user_config = config
       self.set_controls({ key:value for key, value in self.user_config.items() if key != "BaseName" })
-      self.write_config_file("config/user.config", config)
+      
   
   def _change_resolution(self, mode : int):
       """Changes the size (width and height) of output image.

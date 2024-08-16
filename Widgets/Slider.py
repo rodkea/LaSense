@@ -91,5 +91,7 @@ class Slider(QWidget):
     def set_value(self, value: int):
         self._slider.setValue(value)
         self._update_label(value)
+    def value(self) -> int:
+        return self._slider.value()
         
     

@@ -4,10 +4,11 @@ from config import ConfigType
 class Signals(QObject):  
   
   
-  on_analize_signal = pyqtSignal()
-  on_analize_signal_done = pyqtSignal()
+  on_analyze_signal = pyqtSignal()
+  on_analyze_signal_done = pyqtSignal()
   on_record_signal = pyqtSignal()
   on_config_signal = pyqtSignal()
+  on_config_signal_done = pyqtSignal()
   on_stop_signal = pyqtSignal()
   on_exit_signal = pyqtSignal()
   on_change_brightness = pyqtSignal(int)
@@ -16,5 +17,5 @@ class Signals(QObject):
   on_change_sharpness = pyqtSignal(int)
   on_change_saturation = pyqtSignal(int)
   on_change_noise_reduction = pyqtSignal(int)
-  on_set_user_settings = pyqtSignal(ConfigType)
+  on_set_user_settings = pyqtSignal(dict)
   

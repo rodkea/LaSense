@@ -10,6 +10,10 @@ class ButtonsMenu(QWidget):
     self._layout.setSpacing(20)
     # SIGNALS
     self._signals = signals
+    self._signals.on_config_signal.connect(self._on_config)
+    self._signals.on_config_signal_done.connect(self._on_config_done)
+    self._signals.on_analyze_signal.connect(self._on_analyze)
+    self._signals.on_analyze_signal_done.connect(self._on_analyze_done)
     # RECORD BUTTON
     self._record_btn = Button(
       icon_path="Assets/svg/record.svg",
@@ -22,7 +26,7 @@ class ButtonsMenu(QWidget):
       icon_path="Assets/svg/ml.svg",
       icon_path_hover="Assets/svg/ml-hover.svg",
       icon_path_disabled="Assets/svg/ml-disabled.svg",
-      signal=self._signals.on_analize_signal  
+      signal=self._signals.on_analyze_signal  
     )
     self._layout.addWidget(self._analyze_btn)
     # CONFIG BUTTON
@@ -47,3 +51,23 @@ class ButtonsMenu(QWidget):
       QSizePolicy.Policy.Minimum,
       QSizePolicy.Policy.Fixed
     )
+
+  def _on_config(self):
+    self._analyze_btn.set_disabled()
+    self._record_btn.set_disabled()
+    self._exit_btn.set_disabled()
+
+  def _on_config_done(self):
+    self._analyze_btn.set_enabled()
+    self._record_btn.set_enabled()
+    self._exit_btn.set_enabled()
+
+  def _on_analyze(self):
+    self._config_btn.set_disabled()
+    self._record_btn.set_disabled()
+    self._exit_btn.set_disabled()
+
+  def _on_analyze_done(self):
+    self._config_btn.set_enabled()
+    self._record_btn.set_enabled()
+    self._exit_btn.set_enabled()
