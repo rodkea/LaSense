@@ -6,10 +6,10 @@ class Signals(QObject):
   
   on_analyze_signal = pyqtSignal()
   on_analyze_signal_done = pyqtSignal()
-  on_record_signal = pyqtSignal()
+  on_recording_signal = pyqtSignal()
   on_config_signal = pyqtSignal()
   on_config_signal_done = pyqtSignal()
-  on_stop_signal = pyqtSignal()
+  on_stop_recording_signal = pyqtSignal()
   on_exit_signal = pyqtSignal()
   on_change_brightness = pyqtSignal(int)
   on_change_contrast = pyqtSignal(int)

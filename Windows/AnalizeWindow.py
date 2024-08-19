@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QFileSystemModel, QHBoxLayout, QListView, QPushButton, QSizePolicy, QStyledItemDelegate, QVBoxLayout, QWidget
-from PyQt5.QtCore import QDir, QSize
+from PyQt5.QtCore import QDir, QSize, Qt
 from Signals import Signals
+from descriptors import d_fuzzy
 
 class MyDelegate(QStyledItemDelegate):
     """
@@ -96,17 +97,23 @@ class AnalizeWindow(QWidget):
       self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
     def _on_analize(self):
-      """
-      Applies a custom algorithm to the selected video files to compute a biological activity score.
+        """
+        Applies a custom algorithm to the selected video files to compute a biological activity score.
 
-      The score is used to evaluate the level of biological activity in the sample.
-      Once the analysis is complete, the score is typically used to determine the presence and intensity
-      of biological processes in the video data.
+        The score is used to evaluate the level of biological activity in the sample.
+        Once the analysis is complete, the score is typically used to determine the presence and intensity
+        of biological processes in the video data.
 
-      This method is a placeholder for the actual implementation of the analysis algorithm.
-      Currently, it only prints 'ANALYZE' to the console.
-      """
-      print("ANALYZE")
-    
+        This method is a placeholder for the actual implementation of the analysis algorithm.
+        Currently, it only prints 'ANALYZE' to the console.
+        """
+        indexes = self._lv.selectedIndexes()
+        if indexes:
+            index = indexes[0]
+            item_text = self._file_model.data(index, Qt.DisplayRole)   
+            path = f'outputs/{item_text}' 
+            d_fuzzy(path, 1920, 1080)
+
+
     def _on_close(self):
         self._signals.on_analyze_signal_done.emit()

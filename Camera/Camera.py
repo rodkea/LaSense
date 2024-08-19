@@ -1,7 +1,7 @@
 from picamera2 import Picamera2
 from PyQt5.QtCore import pyqtSlot
 from .ConfigEnums import Resolution
-from picamera2.encoders import H264Encoder, Quality
+from picamera2.encoders import H264Encoder, Quality, Encoder
 from datetime import datetime
 from Signals import Signals
 from config import ConfigType
@@ -28,20 +28,14 @@ class Camera(Picamera2):
       self._signals.on_change_saturation.connect(self._change_saturation)   
       self._signals.on_change_sharpness.connect(self._change_sharpness)
       self._signals.on_set_user_settings.connect(self.change_user_config)
-      #self._user_config =  self._read_config_file(self.USER_CONFIG_PATH)
-      
-      #self._default_config = self._read_config_file(self.DEFAULT_CONFIG_PATH)
-      #video_config = self.create_video_configuration(
-      #    main = {"size" : (1920, 1080)},
-      #     raw = {"format": 'SGBRG10'},                     
-      #   controls = { key:value for key, value in self.user_config.items() if key != "BaseName" }
-      #)
+      self._signals.on_recording_signal.connect(self.start_recording)
+      self._signals.on_stop_recording_signal.connect(self.stop_recording)
       video_config = self.create_video_configuration(
-          main = {"size" : (1920, 1080)},
-          raw = {"format": 'SGBRG10'},                     
+          main = {"size" : (1920, 1080), "format": 'YUV420'}, encode="main"                             
       )
       self.align_configuration(video_config)
-      self.configure(video_config)          
+      self.configure(video_config)   
+      print(self.camera_configuration())      
 
   @property
   def user_config(self):
@@ -276,13 +270,13 @@ class Camera(Picamera2):
 
   def start_recording(self):
       current_datetime = datetime.now().strftime("%d%m%y-%H%M")              
-      if not os.path.exists(f"outputs/{self.user_config['BaseName']}-{current_datetime}.h264"):
-          output = f"outputs/{self.user_config['BaseName']}-{current_datetime}.h264"
+      if not os.path.exists(f"outputs/{self.user_config['BaseName']}-{current_datetime}.yuv"):
+          output = f"outputs/{self.user_config['BaseName']}-{current_datetime}.yuv"
       else:    
           count = 1           
           while True:                                
-              if not os.path.exists(f"outputs/{self.user_config['BaseName']}-{current_datetime}({count}).h264"):                    
-                  output = f"outputs/{self.user_config['BaseName']}-{current_datetime}({count}).h264"
+              if not os.path.exists(f"outputs/{self.user_config['BaseName']}-{current_datetime}({count}).yuv"):                    
+                  output = f"outputs/{self.user_config['BaseName']}-{current_datetime}({count}).yuv"
                   break                
               count += 1
       self.start_encoder(self._encoder, output, quality=Quality.VERY_HIGH)
