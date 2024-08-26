@@ -34,8 +34,7 @@ class Camera(Picamera2):
           main = {"size" : (1920, 1080), "format": 'YUV420'}, encode="main"                             
       )
       self.align_configuration(video_config)
-      self.configure(video_config)   
-      print(self.camera_configuration())      
+      self.configure(video_config)
 
   @property
   def user_config(self):

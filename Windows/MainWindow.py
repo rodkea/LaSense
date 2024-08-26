@@ -19,8 +19,10 @@ class MainWindow(QMainWindow):
         # SIGNALS
         self._signals = Signals()
         self._signals.on_exit_signal.connect(self.close)
-        self._signals.on_analyze_signal.connect(self._on_analyze)
-        self._signals.on_analyze_signal_done.connect(self._on_analyze_done)
+        self._signals.on_analyze_windwow_open.connect(self._on_analyze)
+        self._signals.on_analyze_window_close.connect(self._on_analyze_done)
+        self._signals.on_config_signal.connect(self._on_config)
+        self._signals.on_config_signal_done.connect(self._on_config_done)
         # CAMERA 
         self._camera = Camera(Resolution.FHD, signals=self._signals)
         # WIDGETS
@@ -41,7 +43,7 @@ class MainWindow(QMainWindow):
         self._layout.addWidget(self._analyze_window)
         # POPUPS
         self._config_popup = ConfigPopup(signals=self._signals, parent=self)
-        self._signals.on_config_signal.connect(self.on_config)
+        
         # WINDOW SETUP
         self.setWindowTitle("LaSense")
         self.setCentralWidget(self._central_widget)
@@ -49,8 +51,11 @@ class MainWindow(QMainWindow):
         self._camera.start()
         self._load_config(USER_CONFIG_PATH)
 
-    def on_config(self):
+    def _on_config(self):
         self._config_popup.show()
+        
+    def _on_config_done(self):
+        self._config_popup.hide()
         
     def _on_analyze(self):
         self._prev_cam_widget.hide()

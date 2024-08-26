@@ -146,7 +146,7 @@ class ConfigPopup(QDialog):
         user_setings = read_config(USER_CONFIG_PATH)
         self._signals.on_set_user_settings.emit(user_setings)
         self._signals.on_config_signal_done.emit()
-        self.close()
+        
 
     def _on_load_settings(self, config : ConfigType):
         self._iso_slider.set_value(int(config["AnalogueGain"] * 10) )

@@ -54,7 +54,7 @@ class Button(QSvgWidget):
                  icon_path_disabled: str | None = None,
                  enabled: bool = True,
                  width: int = 25, height: int = 25,
-                 signal: pyqtSignal | None = None,
+                 signal: pyqtSignal | None = None,                 
                  parent: QWidget | None = None):
         """Creates a Button with an SVG icon.
         Args:
@@ -68,7 +68,7 @@ class Button(QSvgWidget):
         """
         super().__init__(parent)
         self.setFixedSize(width, height)
-        self._is_enabled = enabled
+        self._is_enabled = enabled        
         self._signal = signal
         # ICON PATHS
         self._icon_path = icon_path
@@ -105,6 +105,7 @@ class Button(QSvgWidget):
         else:
             self.load(self._icon_path_disabled)
         super().leaveEvent(event)
+        
 
     def mousePressEvent(self, event):
         # Manejar el evento de click

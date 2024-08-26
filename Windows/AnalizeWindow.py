@@ -1,7 +1,28 @@
-from PyQt5.QtWidgets import QFileSystemModel, QHBoxLayout, QListView, QPushButton, QSizePolicy, QStyledItemDelegate, QVBoxLayout, QWidget
-from PyQt5.QtCore import QDir, QSize, Qt
+import os
+from PyQt5.QtWidgets import QFileSystemModel, QSpacerItem, QHBoxLayout, QListView, QMessageBox, QSizePolicy, QStyledItemDelegate, QVBoxLayout, QWidget
+from PyQt5.QtCore import QDir, QSize, Qt, QThread
 from Signals import Signals
 from descriptors import d_fuzzy
+from Components import AnalyzeButtonsMenu
+from numpy import median, mean
+from Widgets import MplCanvas
+
+class Worker(QThread):
+    
+
+    def __init__(self, path, canva : MplCanvas, parent=None):
+        super().__init__(parent)
+        self._canva = canva
+        self._path = path
+
+    def run(self):
+        if self._canva. cb:
+            self._canva.cb.remove()
+        result = d_fuzzy(self._path, 1920, 1080)
+        cax = self._canva.axes.imshow(result, cmap='viridis')
+        self._canva.cb = self._canva.figure.colorbar(cax, ax=self._canva.axes)
+        self._canva.draw()
+        
 
 class MyDelegate(QStyledItemDelegate):
     """
@@ -14,7 +35,7 @@ class MyDelegate(QStyledItemDelegate):
       """
 
     def sizeHint(self, option, index):
-        """
+        """-
         Returns the size hint for each item, setting a custom height.
 
         Parameters:
@@ -69,11 +90,14 @@ class AnalizeWindow(QWidget):
       self.hide()
       self._layout = QHBoxLayout()
       # SIGNALS
-      self._signals = signals
+      self._signals = signals      
+      self._signals.on_analyze_signal.connect(self._on_analize)
+      self._signals.on_delete_file.connect(self._on_delete)
       # FILE MODEL
       self._file_model = QFileSystemModel(parent=self)
       self._file_model.setFilter(
           QDir.Filter.NoDotAndDotDot | QDir.Filter.Files)
+      
       # LIST VIEW
       self._lv = QListView()
       self._lv.setModel(self._file_model)
@@ -83,14 +107,14 @@ class AnalizeWindow(QWidget):
       self._layout.addWidget(self._lv)
       # RIGHT MENU
       self._right_layout = QVBoxLayout()
-      # SALIR BUTTON
-      self._btn_cancel = QPushButton("SALIR")
-      self._btn_cancel.clicked.connect(self._on_close)
-      self._layout.addWidget(self._btn_cancel)
-      # ANALYZE BUTTON
-      self._btn_analyze = QPushButton("ANALIZAR")
-      self._btn_analyze.clicked.connect(self._on_analize)
-      self._layout.addWidget(self._btn_analyze)
+     # CANVAS
+      self._canvas = MplCanvas()
+      self._right_layout.addWidget(self._canvas)
+       # SPACER
+      self._right_layout.addSpacerItem(QSpacerItem(20, 20,vPolicy= QSizePolicy.Policy.MinimumExpanding))    
+      # BUTTONS MENU
+      self._buttons_menu = AnalyzeButtonsMenu(signals=signals)
+      self._right_layout.addWidget(self._buttons_menu)      
       # LAYOUT
       self._layout.addLayout(self._right_layout)
       self.setLayout(self._layout)
@@ -110,10 +134,32 @@ class AnalizeWindow(QWidget):
         indexes = self._lv.selectedIndexes()
         if indexes:
             index = indexes[0]
-            item_text = self._file_model.data(index, Qt.DisplayRole)   
-            path = f'outputs/{item_text}' 
-            d_fuzzy(path, 1920, 1080)
+            item_text = self._file_model.data(index, Qt.DisplayRole)
+            # WORKER
+            
+            path = f'outputs/{item_text}'
+            self._worker = Worker(path, self._canvas)
+            self._worker.finished.connect(self._on_analyze_done)
+            self._worker.start() 
 
-
-    def _on_close(self):
+    def _on_analyze_done(self):
         self._signals.on_analyze_signal_done.emit()
+            
+    def _on_delete(self):
+        """
+        Deletes the selected file from the list view and the filesystem.
+        """
+        indexes = self._lv.selectedIndexes()
+        if indexes:
+            index = indexes[0]
+            item_text = self._file_model.data(index, Qt.DisplayRole)
+            path = f'outputs/{item_text}'
+            reply = QMessageBox.question(self, 'Borrar Archivo', f'¿Estas seguro de eliminar "{item_text}"?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            
+            if reply == QMessageBox.Yes:
+                try:
+                    os.remove(path)
+                    self._file_model.remove(index)
+                except Exception as e:
+                    QMessageBox.critical(self, 'Error', f'Failed to delete file: {str(e)}')
+
