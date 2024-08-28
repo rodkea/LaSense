@@ -5,20 +5,26 @@ from Signals import Signals
 from descriptors import d_fuzzy
 from Components import AnalyzeButtonsMenu
 from numpy import median, mean
-from Widgets import MplCanvas
+from Widgets import MplCanvas, ValueBox
 
 class Worker(QThread):
     
 
-    def __init__(self, path, canva : MplCanvas, parent=None):
+    def __init__(self, path, canva : MplCanvas, mean_vb : ValueBox, median_vb : ValueBox, parent=None):
         super().__init__(parent)
         self._canva = canva
         self._path = path
+        self._mean_vb = mean_vb
+        self._median_vb = median_vb
 
     def run(self):
+        self._mean_vb.clear_value()
+        self._median_vb.clear_value()
         if self._canva. cb:
             self._canva.cb.remove()
         result = d_fuzzy(self._path, 1920, 1080)
+        self._mean_vb.set_value(mean(result))
+        self._median_vb.set_value(median(result))
         cax = self._canva.axes.imshow(result, cmap='viridis')
         self._canva.cb = self._canva.figure.colorbar(cax, ax=self._canva.axes)
         self._canva.draw()
@@ -110,7 +116,14 @@ class AnalizeWindow(QWidget):
      # CANVAS
       self._canvas = MplCanvas()
       self._right_layout.addWidget(self._canvas)
-       # SPACER
+      # STATS
+      self._stats_layout = QHBoxLayout()
+      self._mean_vb = ValueBox("MEDIA") 
+      self._stats_layout.addWidget(self._mean_vb)
+      self._median_vb = ValueBox("MEDIANA")
+      self._stats_layout.addWidget(self._median_vb)
+      self._right_layout.addLayout(self._stats_layout)
+      # SPACER
       self._right_layout.addSpacerItem(QSpacerItem(20, 20,vPolicy= QSizePolicy.Policy.MinimumExpanding))    
       # BUTTONS MENU
       self._buttons_menu = AnalyzeButtonsMenu(signals=signals)
@@ -138,7 +151,7 @@ class AnalizeWindow(QWidget):
             # WORKER
             
             path = f'outputs/{item_text}'
-            self._worker = Worker(path, self._canvas)
+            self._worker = Worker(path, self._canvas, self._mean_vb, self._median_vb)
             self._worker.finished.connect(self._on_analyze_done)
             self._worker.start() 
 
